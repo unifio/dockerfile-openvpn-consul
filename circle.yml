@@ -1,0 +1,32 @@
+machine:
+  environment:
+    DOCKER_OPENVPN_SERVER_VERSION: 0.0.1
+  services:
+    - docker
+
+dependencies:
+  cache_directories:
+    - "~/docker"
+  override:
+    - docker info
+    - if [[ -e ~/docker/image.tar ]]; then docker load --input ~/docker/image.tar; fi
+    - docker build -t unifio/docker-openvpn-server-consul .
+    - mkdir -p ~/docker
+    - docker save unifio/docker-openvpn-server-consul > ~/docker/image.tar
+
+test:
+  override:
+    - docker run --entrypoint /usr/local/bin/consul unifio/docker-openvpn-server-consul version
+    - docker run --entrypoint /usr/local/bin/envconsul unifio/concourse-consul -version
+    - docker run --entrypoint /usr/local/bin/consul-template unifio/concourse-consul -version
+    - docker run --rm unifio/docker-openvpn-server-consul openvpn --version || true
+    - docker run --rm unifio/docker-openvpn-server-consul openssl version
+    - test/run.sh unifio/docker-openvpn-server-consul
+
+deployment:
+  hub:
+    branch: master
+    commands:
+      - docker login -e $DOCKER_EMAIL -u $DOCKER_USER -p $DOCKER_PASS
+      - docker tag -f `docker images | grep -E 'unifio/docker-openvpn-server-consul' | awk '{print $3}'` unifio/docker-openvpn-server-consul:${DOCKER_OPENVPN_SERVER_VERSION}
+      - docker push unifio/docker-openvpn-server-consul
