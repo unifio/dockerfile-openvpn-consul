@@ -1,7 +1,7 @@
 machine:
   environment:
     DOCKER_OPENVPN_SERVER_VERSION: 0.0.1
-    DOCKER_IMAGE: 'unifio/docker-openvpn-server-consul'
+    DOCKER_IMAGE: 'unifio/openvpn-server-consul'
   services:
     - docker
 
