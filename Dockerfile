@@ -1,9 +1,8 @@
 # Original credit: https://github.com/jpetazzo/dockvpn
-
-# Smallest base image
-FROM alpine:3.4
-
-MAINTAINER Kyle Manna <kyle@kylemanna.com>
+# Additional credit: https://hub.docker.com/r/kylemanna/openvpn
+# Build from kylemanna/openvpn
+FROM kylemanna/openvpn:latest
+MAINTAINER Unif.io, Inc. <support@unif.io>
 
 # Needed for hashicorp tool install 
 ENV ENVCONSUL_VERSION=0.6.1
@@ -11,10 +10,8 @@ ENV CONSULTEMPLATE_VERSION=0.16.0
 
 RUN echo "http://dl-4.alpinelinux.org/alpine/edge/community/" >> /etc/apk/repositories && \
     echo "http://dl-4.alpinelinux.org/alpine/edge/testing/" >> /etc/apk/repositories && \
-    apk add --update openvpn curl unzip iptables bash easy-rsa \
-    openvpn-auth-ldap openvpn-auth-pam google-authenticator pamtester groff \
-    less python gnupg py-pip && \
-    ln -s /usr/share/easy-rsa/easyrsa /usr/local/bin && \
+    apk add --update curl unzip openvpn-auth-ldap groff less python \
+    gnupg py-pip && \
     pip install awscli && \
     apk --purge -v del py-pip && \
     mkdir -p /tmp/build && \
