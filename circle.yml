@@ -2,6 +2,7 @@ machine:
   environment:
     DOCKER_OPENVPN_SERVER_VERSION: 0.0.1
     DOCKER_IMAGE: 'unifio/docker-openvpn-server-consul'
+    GIT_BRANCH: 'db-consul-s3-wip'
   services:
     - docker
 
@@ -17,17 +18,17 @@ dependencies:
 
 test:
   override:
-    - docker run --entrypoint /usr/local/bin/consul ${DOCKER_IMAGE} version
-    - docker run --entrypoint /usr/local/bin/envconsul unifio/concourse-consul -version
-    - docker run --entrypoint /usr/local/bin/consul-template unifio/concourse-consul -version
+    - docker run --entrypoint /usr/local/bin/envconsul ${DOCKER_IMAGE} -version
+    - docker run --entrypoint /usr/local/bin/consul-template ${DOCKER_IMAGE} -version
     - docker run --rm ${DOCKER_IMAGE} openvpn --version || true
     - docker run --rm ${DOCKER_IMAGE} openssl version
+    - docker run --rm ${DOCKER_IMAGE} aws --version
     - test/run.sh ${DOCKER_IMAGE}
 
 deployment:
   hub:
-    branch: master
+    branch: ${GIT_BRANCH}
     commands:
       - docker login -e $DOCKER_EMAIL -u $DOCKER_USER -p $DOCKER_PASS
-      - docker tag -f `docker images | grep -E "${DOCKER_IMAGE}" | awk '{print $3}'` ${DOCKER_IMAGE}:${DOCKER_OPENVPN_SERVER_VERSION}
+      - docker tag `docker images | grep -E "${DOCKER_IMAGE}" | awk '{print $3}'` ${DOCKER_IMAGE}:${DOCKER_OPENVPN_SERVER_VERSION}
       - docker push ${DOCKER_IMAGE}
