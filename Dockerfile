@@ -11,7 +11,7 @@ ENV CONSULTEMPLATE_VERSION=0.16.0
 RUN echo "http://dl-4.alpinelinux.org/alpine/edge/community/" >> /etc/apk/repositories && \
     echo "http://dl-4.alpinelinux.org/alpine/edge/testing/" >> /etc/apk/repositories && \
     apk add --update curl unzip openvpn-auth-ldap groff less python \
-    gnupg py-pip && \
+    gnupg py2-pip && \
     pip install awscli && \
     mkdir -p /tmp/build && \
     cd /tmp/build && \
@@ -28,7 +28,7 @@ RUN echo "http://dl-4.alpinelinux.org/alpine/edge/community/" >> /etc/apk/reposi
     grep consul-template_${CONSULTEMPLATE_VERSION}_linux_amd64.zip consul-template_${CONSULTEMPLATE_VERSION}_SHA256SUMS | sha256sum -c && \
     unzip -d /usr/local/bin envconsul_${ENVCONSUL_VERSION}_linux_amd64.zip && \
     unzip -d /usr/local/bin consul-template_${CONSULTEMPLATE_VERSION}_linux_amd64.zip && \
-    apk --purge -v del py-pip gnupg unzip curl && \
+    apk --purge -v del py2-pip gnupg unzip curl && \
     rm -rf /tmp/* /var/tmp/* /var/cache/apk/* /var/cache/distfiles/*
 
 # Needed by scripts
